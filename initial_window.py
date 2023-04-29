@@ -29,9 +29,7 @@ def setWindow(window):
     title_font = font.Font(family='Helvetica', size=16, weight='bold')
     title_label = Label(frame1, text="Welcome to LMS Database", font=title_font,bg = Dg, fg = Fg, pady= 40)
     title_label.pack(pady=20)
-
     
-
     get_started = Button(frame1,text="Get Started", fg = Fg, bg = Bg, width= 15, height= 2, 
                         borderwidth=0, relief="ridge", activebackground="#ffffff")
     get_started.pack()
