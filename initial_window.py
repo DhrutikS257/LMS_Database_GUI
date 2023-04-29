@@ -21,15 +21,15 @@ class App:
 
         lib_png = CTkImage(dark_image=Image.open("icons/bookshelf.png"),size=(150,200))
         lib_label = ck.CTkLabel(master=into_frame,image=lib_png, text="")
-        lib_label.pack()
+        lib_label.pack(pady=20)
 
         title_font = CTkFont(family='Helvetica',size=16,weight='bold')
-        intro_label = ck.CTkLabel(master=into_frame,text="Welcome to LMS Database",font=title_font,pady=40)
-        intro_label.pack()
+        intro_label = ck.CTkLabel(master=into_frame,text="Welcome to LMS Database",font=title_font)
+        intro_label.pack(pady=20)
 
         button_font = CTkFont(family='Helvetica',size=12)
         get_started = CTkButton(master=into_frame,text="Get Started",fg_color="#0077b6",width=40,height=30,corner_radius=10,font=button_font)
-        get_started.pack()
+        get_started.pack(pady=20)
         
 
 
