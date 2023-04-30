@@ -53,6 +53,7 @@ class App:
         
         self.tab_view()
 
+        # back button
         button_font = CTkFont(family='Helvetica',size=24)
         go_back_button = CTkButton(master=self.home_frame, text="Back",fg_color="#0077b6",
                                     width=60,height=50,corner_radius=20,font=button_font,command=self.go_back_into)
@@ -62,58 +63,167 @@ class App:
         tab_font = CTkFont(family='Helvetica',size=32)
         self.tabview.add("Book Checkout")
         self.tabview.add("Add Borrower")
+        self.tabview.add("New Book")
+        self.tabview.add("List Book Copies")
+        self.tabview.add("Late Return")
+        self.tabview.add("Late Fee")
+        self.tabview.add("Book Information")
 
+
+
+
+        # name input for book checkout
         name_label = CTkLabel(master=self.tabview.tab("Book Checkout"),text="Borrower Name:",font=tab_font)
         name_label.place(relx=0.05,rely=0.05,anchor=tk.W)
         self.name_input = CTkEntry(master=self.tabview.tab("Book Checkout"),placeholder_text="Name",width=450,height=60,corner_radius=15)
         self.name_input.place(relx=0.25,rely=0.05,anchor=tk.W)
 
+        # book input for book checkout
         book_label = CTkLabel(master=self.tabview.tab("Book Checkout"),text="Book Title:",font=tab_font)
         book_label.place(relx=0.12,rely=0.15,anchor=tk.W)
         self.book_input = CTkEntry(master=self.tabview.tab("Book Checkout"),placeholder_text="Title",width=450,height=60,corner_radius=15)
         self.book_input.place(relx=0.25,rely=0.15,anchor=tk.W)
 
+        # submit button for book checkout
         button_font = CTkFont(family='Helvetica',size=20)
         checkout_submit_button = CTkButton(master=self.tabview.tab("Book Checkout"),text="Submit",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.checkout_query)
         checkout_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
+        # print book copies for book checkout
         self.print_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Print Copies",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.print_copies)
         self.print_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
 
+        # print book loans for book checkout
         self.print_loan_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Print Loans",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.print_loans)
         self.print_loan_query.place(relx=0.20,rely=0.97,anchor=tk.SW)
         
+
+        # name input for Add Borrower
         bor_name = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Name:",font=tab_font)
         bor_name.place(relx=0.05,rely=0.05,anchor=tk.W)
         self.bor_name_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Name",width=450,height=60,corner_radius=15)
         self.bor_name_input.place(relx=0.25,rely=0.05,anchor=tk.W)
 
+        # address input for Add Borrower
         bor_add = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Address:",font=tab_font)
         bor_add.place(relx=0.025,rely=0.15,anchor=tk.W)
         self.bor_add_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Address",width=450,height=60,corner_radius=15)
         self.bor_add_input.place(relx=0.25,rely=0.15,anchor=tk.W)
 
+        # phone input for Add Borrower
         bor_phone = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Phone:",font=tab_font)
         bor_phone.place(relx=0.048,rely=0.25,anchor=tk.W)
         self.bor_phone_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Phone",width=450,height=60,corner_radius=15)
         self.bor_phone_input.place(relx=0.25,rely=0.25,anchor=tk.W)
+
+        # submit button for Add Borrower
         bor_submit_button = CTkButton(master=self.tabview.tab("Add Borrower"),text="Submit",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.bor_query)
         bor_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
+        # Print borrower entered button for Add Borrower
         self.print_bor_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="Print Borrower",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.print_card)
         self.print_bor_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
 
+        # Print all borrowet button for Add Borrower
         self.print_bor_all = CTkButton(master=self.tabview.tab("Add Borrower"),text="Print All Borrower",fg_color="#0077b6",
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.print_all_card)
         self.print_bor_all.place(relx=0.20,rely=0.97,anchor=tk.SW)
 
+
+        book_name = CTkLabel(master=self.tabview.tab("New Book"),text="Book Name:",font=tab_font)
+        book_name.place(relx=0.1,rely=0.05,anchor=tk.W)
+        self.book_nm_input = CTkEntry(master=self.tabview.tab("New Book"),placeholder_text="Book Name",width=450,height=60,corner_radius=15)
+        self.book_nm_input.place(relx=0.25,rely=0.05,anchor=tk.W)
+
+
+        book_author = CTkLabel(master=self.tabview.tab("New Book"),text="Author Name:",font=tab_font)
+        book_author.place(relx=0.08,rely=0.15,anchor=tk.W)
+        self.book_au_input = CTkEntry(master=self.tabview.tab("New Book"),placeholder_text="Author Name",width=450,height=60,corner_radius=15)
+        self.book_au_input.place(relx=0.25,rely=0.15,anchor=tk.W)
+
+        book_publisher = CTkLabel(master=self.tabview.tab("New Book"),text="Publisher Name:",font=tab_font)
+        book_publisher.place(relx=0.05,rely=0.25,anchor=tk.W)
+        self.book_pu_input = CTkEntry(master=self.tabview.tab("New Book"),placeholder_text="Publisher Name",width=450,height=60,corner_radius=15)
+        self.book_pu_input.place(relx=0.25,rely=0.25,anchor=tk.W)
+
+        book_submit_button = CTkButton(master=self.tabview.tab("New Book"),text="Submit",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.add_new_book)
+        book_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
+
+
+
+
         
         self.tabview.pack()
+
+
+    def add_new_book(self):
+
+        self.add_book()
+        self.add_author()
+        self.add_copies()
+
+
+        
+
+    def add_book(self):
+        book_conn = sqlite3.connect('Database_copy.db')
+        book_cur = book_conn.cursor()
+
+        book_name = self.book_nm_input.get()
+        book_publisher = self.book_pu_input.get()
+
+        book_cur.execute(f"""
+                        INSERT INTO BOOK(book_id,title,book_publisher)
+                        VALUES(NULL,'{book_name}','{book_publisher}');""")
+        
+        # book_cur.execute(f"""
+        #                 """)
+        
+        # book_cur.execute(f"""
+        #                 '""")
+        
+
+        book_conn.commit()
+        book_conn.close()
+
+    def add_author(self):
+        auth_conn = sqlite3.connect('Database_copy.db')
+        auth_cur = auth_conn.cursor()
+
+        book_author = self.book_au_input.get()
+        book_name = self.book_nm_input.get()
+
+        auth_cur.execute(f"""
+                        INSERT INTO BOOK_AUTHORS(book_id,author_name)
+                        SELECT DISTINCT book_id, '{book_author}'
+                        FROM BOOK
+                        WHERE title = '{book_name}';""")
+        
+
+        auth_conn.commit()
+        auth_conn.close()
+
+    def add_copies(self):
+        copies_conn = sqlite3.connect('Database_copy.db')
+        copies_cur = copies_conn.cursor()
+
+        book_name = self.book_nm_input.get()
+
+        copies_cur.execute(f"""INSERT INTO BOOK_COPIES(book_id,branch_id,no_of_copies)
+                        SELECT b.book_id,lb.branch_id,5
+                        FROM BOOK b, LIBRARY_BRANCH lb
+                        WHERE lb.branch_id IN (SELECT lbr.branch_id FROM LIBRARY_BRANCH lbr) 
+                        AND b.title = '{book_name}';""")
+        copies_conn.commit()
+        copies_conn.close()
+
+
 
 
     def checkout_query(self):
@@ -189,7 +299,6 @@ class App:
         loan_conn.commit()
         loan_conn.close()
 
-        
 
     def bor_query(self):
         bor_conn = sqlite3.connect('Database_copy.db')
