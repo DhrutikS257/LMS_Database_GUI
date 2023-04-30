@@ -3,11 +3,10 @@ import customtkinter as ck
 from customtkinter import CTkImage
 from customtkinter import CTkFont
 from customtkinter import CTkButton
-# import tkinter as tk
+import tkinter as tk
 
-Bg = '#242526'
-Dg = '#18191A'
-Fg = '#ffffff'
+
+
 
 class App:
     def __init__(self,window):
@@ -15,29 +14,92 @@ class App:
         self.window.title("LMS Database")
         self.window.geometry("600x450")
         self.window.iconbitmap("icons/bookshelf.ico")
+        self.window.resizable(False,False)
+        self.create_into_frame()
 
-        into_frame = ck.CTkFrame(master=self.window)
-        into_frame.pack(fill='both', expand=True)
+    
+
+    def create_into_frame(self):
+        self.into_frame = ck.CTkFrame(master=self.window)
+        self.into_frame.pack(fill='both', expand=True)
 
         lib_png = CTkImage(dark_image=Image.open("icons/bookshelf.png"),size=(150,200))
-        lib_label = ck.CTkLabel(master=into_frame,image=lib_png, text="")
+        lib_label = ck.CTkLabel(master=self.into_frame,image=lib_png, text="")
         lib_label.pack(pady=20)
 
         title_font = CTkFont(family='Helvetica',size=16,weight='bold')
-        intro_label = ck.CTkLabel(master=into_frame,text="Welcome to LMS Database",font=title_font)
+        intro_label = ck.CTkLabel(master=self.into_frame,text="Welcome to LMS Database",font=title_font)
         intro_label.pack(pady=20)
 
         button_font = CTkFont(family='Helvetica',size=12)
-        get_started = CTkButton(master=into_frame,text="Get Started",fg_color="#0077b6",width=40,height=30,corner_radius=10,font=button_font)
+        get_started = CTkButton(master=self.into_frame,text="Get Started",fg_color="#0077b6",
+                                width=40,height=30,corner_radius=20,font=button_font,command = self.home_screen)
         get_started.pack(pady=20)
-        
+
+
+    def home_screen(self):
+        self.into_frame.pack_forget()
+        self.home_frame = ck.CTkFrame(master=self.window)
+        self.home_frame.pack(fill='both', expand=True)
+
+        button_font = CTkFont(family='Helvetica',size=12)
+        go_back_button = CTkButton(master=self.home_frame, text="Back",fg_color="#0077b6",
+                                    width=40,height=30,corner_radius=20,font=button_font,command=self.go_back_into)
+        go_back_button.place(x = 20, y = 400, anchor=tk.SW)
+
+    def go_back_into(self):
+        self.home_frame.pack_forget()
+        self.create_into_frame()
 
 
 
     def run(self):
         self.window.mainloop()
 
+# import tkinter as tk
 
+# class App(tk.Frame):
+#     def __init__(self, master=None):
+#         super().__init__(master)
+#         self.pack()
+#         self.create_widgets()
+
+#     def create_widgets(self):
+#         # Create the first screen
+#         self.screen1 = tk.Frame(self)
+#         self.screen1.pack()
+
+#         self.label1 = tk.Label(self.screen1, text="Screen 1")
+#         self.label1.pack()
+
+#         self.button1 = tk.Button(self.screen1, text="Next", command=self.show_screen2)
+#         self.button1.pack()
+
+#         # Create the second screen
+#         self.screen2 = tk.Frame(self)
+#         self.screen2.pack()
+
+#         self.label2 = tk.Label(self.screen2, text="Screen 2")
+#         self.label2.pack()
+
+#         self.button2 = tk.Button(self.screen2, text="Back", command=self.show_screen1)
+#         self.button2.pack()
+
+#         # Hide the second screen initially
+#         self.screen2.pack_forget()
+
+#     def show_screen1(self):
+#         # Hide the second screen and show the first screen
+#         self.screen2.pack_forget()
+#         self.screen1.pack()
+
+#     def show_screen2(self):
+#         # Hide the first screen and show the second screen
+#         self.screen1.pack_forget()
+#         self.screen2.pack()
+
+# app = App()
+# app.mainloop()
 
 # def setWindow(window):
     
