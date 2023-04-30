@@ -5,6 +5,8 @@ from customtkinter import CTkImage,CTkFont,CTkButton,CTkTabview,CTkEntry,CTkLabe
 from datetime import date, timedelta
 import tkinter as tk
 import pandas as pd
+from prettytable import PrettyTable
+from prettytable import from_db_cursor
 import sqlite3
 
 
@@ -59,6 +61,7 @@ class App:
     def tab_view(self):
         tab_font = CTkFont(family='Helvetica',size=32)
         self.tabview.add("Book Checkout")
+        self.tabview.add("Add Borrower")
 
         name_label = CTkLabel(master=self.tabview.tab("Book Checkout"),text="Borrower Name:",font=tab_font)
         name_label.place(relx=0.05,rely=0.05,anchor=tk.W)
@@ -75,15 +78,43 @@ class App:
                                     width=50,height=40,corner_radius=20,font=button_font,command=self.checkout_query)
         checkout_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
-        print_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Print",fg_color="#0077b6",
-                                    width=50,height=40,corner_radius=20,font=button_font,command=self.print_query)
-        print_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+        self.print_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Print Copies",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.print_copies)
+        self.print_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
 
+        self.print_loan_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Print Loans",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.print_loans)
+        self.print_loan_query.place(relx=0.20,rely=0.97,anchor=tk.SW)
+        
+        bor_name = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Name:",font=tab_font)
+        bor_name.place(relx=0.05,rely=0.05,anchor=tk.W)
+        self.bor_name_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Name",width=450,height=60,corner_radius=15)
+        self.bor_name_input.place(relx=0.25,rely=0.05,anchor=tk.W)
 
-        self.tabview.add("Query 2")
-        label2 = CTkLabel(master=self.tabview.tab("Query 2"),text="Tab2")
-        label2.pack()
+        bor_add = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Address:",font=tab_font)
+        bor_add.place(relx=0.025,rely=0.15,anchor=tk.W)
+        self.bor_add_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Address",width=450,height=60,corner_radius=15)
+        self.bor_add_input.place(relx=0.25,rely=0.15,anchor=tk.W)
+
+        bor_phone = CTkLabel(master=self.tabview.tab("Add Borrower"),text="Borrower Phone:",font=tab_font)
+        bor_phone.place(relx=0.048,rely=0.25,anchor=tk.W)
+        self.bor_phone_input = CTkEntry(master=self.tabview.tab("Add Borrower"),placeholder_text="Phone",width=450,height=60,corner_radius=15)
+        self.bor_phone_input.place(relx=0.25,rely=0.25,anchor=tk.W)
+        bor_submit_button = CTkButton(master=self.tabview.tab("Add Borrower"),text="Submit",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.bor_query)
+        bor_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
+
+        self.print_bor_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="Print Borrower",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.print_card)
+        self.print_bor_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+
+        self.print_bor_all = CTkButton(master=self.tabview.tab("Add Borrower"),text="Print All Borrower",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.print_all_card)
+        self.print_bor_all.place(relx=0.20,rely=0.97,anchor=tk.SW)
+
+        
         self.tabview.pack()
+
 
     def checkout_query(self):
         checkout_conn = sqlite3.connect('Database_copy.db')
@@ -94,6 +125,7 @@ class App:
         title = self.book_input.get()
         today = date.today()
         month = today + timedelta(days=30)
+
         checkout_cur.execute(f"""
                             INSERT INTO BOOK_LOANS(book_id,branch_id,card_no,date_out,due_date,Late)
                             SELECT b.book_id,bc.branch_id,bo.card_no,'{today}','{month}',0
@@ -108,36 +140,125 @@ class App:
                                             FROM BOOK
                                             WHERE title = '{title}');""")
         
-        # df = pd.read_sql_query("SELECT DISTINCT bo.title bc.no_of_copies FROM ",checkout_conn)
-
         checkout_conn.commit()
         checkout_conn.close()
 
-    def print_query(self):
-        checkout_conn = sqlite3.connect('Database_copy.db')
-        checkout_cur = checkout_conn.cursor()
+    def print_copies(self):
 
-        checkout_cur.execute("SELECT * FROM BOOK_COPIES")
+        copies_conn = sqlite3.connect('Database_copy.db')
+        copies_cur= copies_conn.cursor()
 
-        output = checkout_cur.fetchall()
+        copies_cur.execute("SELECT * FROM BOOK_COPIES")
 
-        print_record = ""
-        print_record += "book_id"+"\t\t"+"branch_id"+"\t\t"+"no_of_copies"+"\n\n"
+        print_table = from_db_cursor(copies_cur)
+        print_table.left_padding_width=10
+        print_table.right_padding_width=10
 
-        for row in output:
-            print_record += str(row[0]) + "\t\t" + str(row[1]) + "\t\t" + str(row[2]) + "\n"
+        print_font = CTkFont(family='Helvetica',size=14)
+        self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text=print_table,font=print_font)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
 
-        print_font = CTkFont(family='Helvetica',size=18)
-        print_label = CTkLabel(self.tabview.tab("Book Checkout"),text=print_record,font=print_font)
-        print_label.place(relx=0.50,rely=0.50,anchor=tk.CENTER)
+        button_font = CTkFont(family='Helvetica',size=20)
+        self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Hide Copies",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+        
 
-        # df = pd.read_sql_query("SELECT * FROM BOOK_COPIES",checkout_conn)
-        # label = CTkLabel(master=self.tabview,text=df)
+        copies_conn.commit()
+        copies_conn.close()
 
-        # label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+    def print_loans(self):
+        loan_conn = sqlite3.connect('Database_copy.db')
+        loans_cur = loan_conn.cursor()
 
-        checkout_conn.commit()
-        checkout_conn.close()
+        loans_cur.execute("""SELECT * FROM BOOK_LOANS""")
+
+        print_table = from_db_cursor(loans_cur)
+        print_table.left_padding_width=5
+        print_table.right_padding_width=5
+
+        print_font = CTkFont(family='Helvetica',size=14)
+        self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text=print_table,font=print_font)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+        button_font = CTkFont(family='Helvetica',size=20)
+        self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="Hide Loans",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.20,rely=0.97,anchor=tk.SW)
+        
+        loan_conn.commit()
+        loan_conn.close()
+
+        
+
+    def bor_query(self):
+        bor_conn = sqlite3.connect('Database_copy.db')
+        bor_cur = bor_conn.cursor()
+
+        self.name = self.bor_name_input.get()
+        address = self.bor_add_input.get()
+        phone = self.bor_phone_input.get()
+
+        bor_cur.execute(f"""
+                        INSERT INTO BORROWER(card_no,name,address,phone)
+                        VALUES(NULL,'{self.name}','{address}','{phone}');""")
+
+        bor_conn.commit()
+        bor_conn.close()
+
+    def print_all_card(self):
+        card_conn = sqlite3.connect('Database_copy.db')
+        card_cur = card_conn.cursor()
+        card_cur.execute("""SELECT card_no,name FROM BORROWER;""")
+
+        print_table = from_db_cursor(card_cur)
+        print_table.left_padding_width=5
+        print_table.right_padding_width=5
+
+        print_font = CTkFont(family='Helvetica',size=14)
+        self.print_label = CTkLabel(self.tabview.tab("Add Borrower"),text=print_table,font=print_font)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+        button_font = CTkFont(family='Helvetica',size=20)
+        self.hide_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="Hide All Borrower",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.20,rely=0.97,anchor=tk.SW)
+
+        card_conn.commit()
+        card_conn.close()
+
+
+
+    def print_card(self):
+        card_conn = sqlite3.connect('Database_copy.db')
+        card_cur = card_conn.cursor()
+
+        card_cur.execute(f"""SELECT card_no, name FROM BORROWER WHERE name = '{self.name}'""")
+
+        print_table = from_db_cursor(card_cur)
+        print_table.left_padding_width=5
+        print_table.right_padding_width=5
+        
+        print_font = CTkFont(family='Helvetica',size=14)
+        self.print_label = CTkLabel(self.tabview.tab("Add Borrower"),text=print_table,font=print_font)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+
+        button_font = CTkFont(family='Helvetica',size=20)
+        self.hide_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="Hide Borrower",fg_color="#0077b6",
+                                    width=50,height=40,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+        
+
+
+        card_conn.commit()
+        card_conn.close()
+
+
+
+    def hide_copies(self):
+        self.print_label.place_forget()
+        self.hide_query.place_forget()
 
 
 
@@ -150,69 +271,3 @@ class App:
 
     def run(self):
         self.window.mainloop()
-
-
-# import tkinter as tk
-# from ctk import CTk, CTkLabel, CTkEntry, CTkButton, CTKTreeview
-# import sqlite3
-# import pandas as pd
-
-# class Library(CTk):
-#     def __init__(self):
-#         super().__init__()
-
-#         self.tabview = self.add_tab('Checkout')
-
-#         self.name_label = CTkLabel(master=self.tabview,text='Name')
-#         self.name_label.place(relx=0.15,rely=0.15,anchor=tk.W)
-#         self.name_input = CTkEntry(master=self.tabview)
-#         self.name_input.place(relx=0.25,rely=0.15,anchor=tk.W)
-
-#         self.book_label = CTkLabel(master=self.tabview,text='Book Title')
-#         self.book_label.place(relx=0.15,rely=0.25,anchor=tk.W)
-#         self.book_input = CTkEntry(master=self.tabview)
-#         self.book_input.place(relx=0.25,rely=0.25,anchor=tk.W)
-
-#         self.checkout_button = CTkButton(master=self.tabview,text='Checkout',command=self.checkout_query)
-#         self.checkout_button.place(relx=0.15,rely=0.3,anchor=tk.W)
-
-#         self.treeview = CTKTreeview(master=self.tabview, columns=('ID', 'Book ID', 'Card No', 'Date Out', 'Due Date', 'Late'))
-#         self.treeview.place(relx=0.1, rely=0.4, anchor=tk.W)
-
-#     def checkout_query(self):
-#         checkout_conn = sqlite3.connect('Database_copy.db')
-#         checkout_cur = checkout_conn.cursor()
-
-#         # Retrieve card_no from BORROWER table based on entered name
-#         name = self.name_input.get()
-#         title = self.book_input.get()
-#         today = date.today()
-#         week = today + timedelta(days=7)
-#         checkout_cur.execute(f"""
-#                             INSERT INTO BOOK_LOANS(book_id,card_no,date_out,due_date,Late)
-#                             SELECT b.book_id,bo.card_no,'{today}','{week}',0
-#                             FROM BORROWER bo, BOOK b
-#                             WHERE b.title ='{title}' AND bo.name = '{name}';""")
-        
-#         checkout_cur.execute(f"""
-#                             UPDATE BOOK_COPIES
-#                             SET no_of_copies = no_of_copies -1
-#                             WHERE book_id IN (
-#                                             SELECT book_id
-#                                             FROM BOOK
-#                                             WHERE title = '{title}');""")
-        
-#         checkout_conn.commit()
-
-#         # Retrieve BOOK_LOANS table from database
-#         df = pd.read_sql_query("SELECT * FROM BOOK_LOANS", checkout_conn)
-
-#         # Update treeview with BOOK_LOANS data
-#         self.treeview.delete(*self.treeview.get_children())
-#         for index, row in df.iterrows():
-#             self.treeview.insert('', tk.END, values=row)
-
-#         checkout_conn.close()
-
-# app = Library()
-# app.mainloop()
