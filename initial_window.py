@@ -12,9 +12,9 @@ class App:
     def __init__(self,window):
         self.window = window
         self.window.title("LMS Database")
-        self.window.geometry("600x450")
+        self.window.geometry("1400x1200")
         self.window.iconbitmap("icons/bookshelf.ico")
-        self.window.resizable(False,False)
+        # self.window.resizable(False,False)
         self.create_into_frame()
 
     
@@ -23,18 +23,18 @@ class App:
         self.into_frame = ck.CTkFrame(master=self.window)
         self.into_frame.pack(fill='both', expand=True)
 
-        lib_png = CTkImage(dark_image=Image.open("icons/bookshelf.png"),size=(150,200))
+        lib_png = CTkImage(dark_image=Image.open("icons/bookshelf.png"),size=(650,700))
         lib_label = ck.CTkLabel(master=self.into_frame,image=lib_png, text="")
-        lib_label.pack(pady=20)
+        lib_label.pack(pady=30)
 
-        title_font = CTkFont(family='Helvetica',size=16,weight='bold')
+        title_font = CTkFont(family='Helvetica',size=32,weight='bold')
         intro_label = ck.CTkLabel(master=self.into_frame,text="Welcome to LMS Database",font=title_font)
-        intro_label.pack(pady=20)
+        intro_label.pack(pady=30)
 
-        button_font = CTkFont(family='Helvetica',size=12)
+        button_font = CTkFont(family='Helvetica',size=18)
         get_started = CTkButton(master=self.into_frame,text="Get Started",fg_color="#0077b6",
-                                width=40,height=30,corner_radius=20,font=button_font,command = self.home_screen)
-        get_started.pack(pady=20)
+                                width=60,height=50,corner_radius=20,font=button_font,command = self.home_screen)
+        get_started.pack(pady=30)
 
 
     def home_screen(self):
@@ -42,10 +42,10 @@ class App:
         self.home_frame = ck.CTkFrame(master=self.window)
         self.home_frame.pack(fill='both', expand=True)
 
-        button_font = CTkFont(family='Helvetica',size=12)
+        button_font = CTkFont(family='Helvetica',size=24)
         go_back_button = CTkButton(master=self.home_frame, text="Back",fg_color="#0077b6",
-                                    width=40,height=30,corner_radius=20,font=button_font,command=self.go_back_into)
-        go_back_button.place(x = 20, y = 400, anchor=tk.SW)
+                                    width=60,height=50,corner_radius=20,font=button_font,command=self.go_back_into)
+        go_back_button.place(x = 20, y = 1175, anchor=tk.SW)
 
     def go_back_into(self):
         self.home_frame.pack_forget()
