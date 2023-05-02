@@ -119,7 +119,6 @@ class App:
         self.bor_phone_input.place(relx=0.26,rely=0.25,anchor=tk.W)
 
         # submit button for Add Borrower
-        self.added = 0
         bor_submit_button = CTkButton(master=self.tabview.tab("Add Borrower"),text="Submit",fg_color="#0077b6",
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.bor_query)
         bor_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
@@ -179,14 +178,26 @@ class App:
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.date_query)
         date_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
+        bor_id = CTkLabel(master=self.tabview.tab("Late Fee"),text="Borrower ID:",font=tab_font)
+        bor_id.place(relx=0.1,rely=0.05,anchor=tk.W)
+        self.bor_id_input = CTkEntry(master=self.tabview.tab("Late Fee"),placeholder_text="ID",width=150,height=30,corner_radius=15)
+        self.bor_id_input.place(relx=0.26,rely=0.05,anchor=tk.W)
 
+        bor_nm = CTkLabel(master=self.tabview.tab("Late Fee"),text="Borrower Name:",font=tab_font)
+        bor_nm.place(relx=0.1,rely=0.15,anchor=tk.W)
+        self.bor_nm_input = CTkEntry(master=self.tabview.tab("Late Fee"),placeholder_text="Name",width=150,height=30,corner_radius=15)
+        self.bor_nm_input.place(relx=0.26,rely=0.15,anchor=tk.W)
+
+        latefee_submit_button = CTkButton(master=self.tabview.tab("Late Fee"),text="Submit",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.late_fee_check)
+        latefee_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
         
         self.tabview.pack(pady=20)
 
-    
+    def late_fee_check():
+        print()
 
-
-
+    # Query 1
     def checkout_query(self):
         checkout_conn = sqlite3.connect('Database_copy.db')
         checkout_cur = checkout_conn.cursor()
@@ -244,6 +255,7 @@ class App:
         checkout_conn.commit()
         checkout_conn.close()
 
+    # Query 1
     def print_copies(self):
 
         copies_conn = sqlite3.connect('Database_copy.db')
@@ -276,6 +288,7 @@ class App:
         copies_conn.commit()
         copies_conn.close()
 
+    # Query 1
     def print_loans(self):
         loan_conn = sqlite3.connect('Database_copy.db')
 
@@ -308,6 +321,7 @@ class App:
         loan_conn.close()
 
 
+    # Query 2
     def bor_query(self):
         bor_conn = sqlite3.connect('Database_copy.db')
         bor_cur = bor_conn.cursor()
@@ -397,7 +411,8 @@ class App:
         bor_conn.commit()
         bor_conn.close()
 
-    # change the table
+    # Query 2
+    # change the print_table and delete entry
     def print_all_card(self):
         card_conn = sqlite3.connect('Database_copy.db')
         card_cur = card_conn.cursor()
@@ -419,8 +434,8 @@ class App:
         card_conn.commit()
         card_conn.close()
 
-
-    # change the print_table
+    # Query 2
+    # change the print_table and delete entry
     def print_card(self):
         card_conn = sqlite3.connect('Database_copy.db')
         card_cur = card_conn.cursor()
@@ -459,7 +474,8 @@ class App:
         card_conn.close()
 
     
-    # do error checking got add_book, add_author, add_copies
+    # Query 3
+    # do error checking got add_book, add_author, add_copies and delete entry
     def add_new_book(self):
 
         self.add_book()
@@ -512,6 +528,7 @@ class App:
 
 
 
+    # Query 4
     # change the print_table
     def loan_num(self):
         loan_conn = sqlite3.connect('Database_copy.db')
@@ -553,6 +570,7 @@ class App:
         loan_conn.commit()
         loan_conn.close()
 
+    # Query 5
     def date_query(self):
         date_conn = sqlite3.connect('Database_copy.db')
 
@@ -563,11 +581,13 @@ class App:
         end_date = self.end_da_input.get()
 
         if start_date != "" and end_date != "":
+            self.start_da_input.delete('0',ck.END)
+            self.end_da_input.delete('0',ck.END)
             print_table = pd.read_sql(f"SELECT bl.card_no,b.title, julianday(bl.returned_date) - julianday(bl.due_date) Late_Day FROM BOOK_LOANS bl NATURAL JOIN BOOK b WHERE (bl.due_date BETWEEN '{start_date}' AND '{end_date}') And bl.Late = 1;",date_conn)
 
             print_font = CTkFont(family='Helvetica',size=12)
 
-            self.print_label = tk.Text(self.tabview.tab("Late Return"),font=print_font,width=80,height=10)
+            self.print_label = tk.Text(self.tabview.tab("Late Return"),font=print_font,width=60,height=10)
             scroll_bar = CTkScrollbar(self.tabview.tab("Late Return"),command=self.print_label.yview)
 
             self.print_label.configure(yscrollcommand=scroll_bar.set)
@@ -614,9 +634,11 @@ class App:
         date_conn.commit()
         date_conn.close()
 
+
     def hide_copies(self):
         self.print_label.place_forget()
         self.hide_query.place_forget()
+
 
     def go_back_into(self):
         self.home_frame.pack_forget()
