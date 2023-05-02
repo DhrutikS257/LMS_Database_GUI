@@ -5,8 +5,6 @@ from customtkinter import CTkImage,CTkFont,CTkButton,CTkTabview,CTkEntry,CTkLabe
 from datetime import date, timedelta
 import tkinter as tk
 import pandas as pd
-from prettytable import PrettyTable
-from prettytable import from_db_cursor
 import sqlite3
 
 
@@ -125,9 +123,9 @@ class App:
 
         # Print borrower entered button for Add Borrower
         
-        self.print_bor_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="BORROWER",fg_color="#0077b6",
+        print_bor_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="BORROWER",fg_color="#0077b6",
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.print_all_card)
-        self.print_bor_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+        print_bor_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
 
 
         book_name = CTkLabel(master=self.tabview.tab("New Book"),text="Book Name:",font=tab_font)
@@ -149,6 +147,18 @@ class App:
         book_submit_button = CTkButton(master=self.tabview.tab("New Book"),text="Submit",fg_color="#0077b6",
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.add_new_book)
         book_submit_button.place(relx=0.97,rely=0.97,anchor=tk.SE)
+
+        print_book_query = CTkButton(master=self.tabview.tab("New Book"),text="BOOK",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.print_book)
+        print_book_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+
+        print_author_query = CTkButton(master=self.tabview.tab("New Book"),text="AUTHOR",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.print_authors)
+        print_author_query.place(relx=0.16,rely=0.97,anchor=tk.SW)
+
+        print_pub_query = CTkButton(master=self.tabview.tab("New Book"),text="PUBLISHER",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.print_publisher)
+        print_pub_query.place(relx=0.315,rely=0.97,anchor=tk.SW)
 
 
         book_title = CTkLabel(master=self.tabview.tab("List Book Copies"),text="Book Name:",font=tab_font)
@@ -204,95 +214,7 @@ class App:
         
         self.tabview.pack(pady=20)
 
-    def book_info_query(self):
-        info_conn = sqlite3.connect('Database_copy.db')
 
-        button_font = CTkFont(family='Helvetica',size=16)
-        print_font = CTkFont(family='Helvetica',size=18)
-
-        id = self.book_id_input.get()
-        title = self.book_ti_input.get()
-
-        if id != "" and title == "":
-            self.book_id_input.delete('0',ck.END)
-
-            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo NATURAL JOIN BOOK b WHERE b.book_id = '{id}' ORDER BY LateFeeBalance DESC;",info_conn)
-
-            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
-            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
-
-            self.print_label.configure(yscrollcommand=scroll_bar.set)
-            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
-
-            columns = "\t\t\t\t".join(print_table.columns)
-            self.print_label.insert(tk.END,columns)
-
-
-            for index,row in print_table.iterrows():
-                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
-
-
-            self.print_label.configure(state="disabled")
-
-            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
-                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
-            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
-        
-        elif id == "" and title != "":
-            self.book_ti_input.delete('0',ck.END)
-
-            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo WHERE title LIKE '%{title}%' ORDER BY LateFeeBalance DESC;",info_conn)
-
-            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
-            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
-
-            self.print_label.configure(yscrollcommand=scroll_bar.set)
-            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
-
-            columns = "\t\t\t\t".join(print_table.columns)
-            self.print_label.insert(tk.END,columns)
-
-
-            for index,row in print_table.iterrows():
-                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
-
-
-            self.print_label.configure(state="disabled")
-
-            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
-                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
-            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
-
-
-        elif id == "" and title == "":
-            
-            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo ORDER BY LateFeeBalance DESC;",info_conn)
-
-            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
-            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
-
-            self.print_label.configure(yscrollcommand=scroll_bar.set)
-            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
-
-            columns = "\t\t\t\t".join(print_table.columns)
-            self.print_label.insert(tk.END,columns)
-
-
-            for index,row in print_table.iterrows():
-                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
-
-
-            self.print_label.configure(state="disabled")
-
-            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
-                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
-            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
-
-
-
-
-        info_conn.commit()
-        info_conn.close()
 
 
     # Query 1
@@ -576,20 +498,6 @@ class App:
         self.hide_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="       Hide         ",fg_color="#0077b6",
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
         self.hide_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
-        # card_cur.execute("""SELECT card_no,name FROM BORROWER;""")
-
-        # print_table = from_db_cursor(card_cur)
-        # print_table.left_padding_width=5
-        # print_table.right_padding_width=5
-
-        # print_font = CTkFont(family='Helvetica',size=8)
-        # self.print_label = CTkLabel(self.tabview.tab("Add Borrower"),text=print_table,font=print_font)
-        # self.print_label.place(relx=0.60,rely=0.60,anchor=tk.CENTER)
-
-        # button_font = CTkFont(family='Helvetica',size=16)
-        # self.hide_query = CTkButton(master=self.tabview.tab("Add Borrower"),text="Hide BORROWER",fg_color="#0077b6",
-        #                             width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
-        # self.hide_query.place(relx=0.23,rely=0.97,anchor=tk.SW)
 
         card_conn.commit()
         card_conn.close()
@@ -686,18 +594,22 @@ class App:
                                         width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
             self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
-
+    # Query 3
     def add_book(self,book_name,book_publisher):
         book_conn = sqlite3.connect('Database_copy.db')
         book_cur = book_conn.cursor()
 
         book_cur.execute(f"""
                         INSERT INTO BOOK(book_id,title,book_publisher)
-                        VALUES(NULL,'{book_name}','{book_publisher}');""")
+                        VALUES(NULL,'{book_name}',
+                        (SELECT publisher_name 
+                        FROM PUBLISHER 
+                        WHERE publisher_name = '{book_publisher}'));""")
 
         book_conn.commit()
         book_conn.close()
 
+    # Query 3
     def add_author(self,book_name,book_author):
         auth_conn = sqlite3.connect('Database_copy.db')
         auth_cur = auth_conn.cursor()
@@ -713,6 +625,7 @@ class App:
         auth_conn.commit()
         auth_conn.close()
 
+    # Query 3
     def add_copies(self,book_name):
         copies_conn = sqlite3.connect('Database_copy.db')
         copies_cur = copies_conn.cursor()
@@ -726,6 +639,111 @@ class App:
         copies_conn.commit()
         copies_conn.close()
 
+    # Query 3
+    def print_publisher(self):
+        book_conn = sqlite3.connect('Database_copy.db')
+
+        button_font = CTkFont(family='Helvetica',size=16)
+        print_font = CTkFont(family='Helvetica',size=18)
+        
+        
+        print_table = pd.read_sql(f"""SELECT publisher_name
+                                FROM PUBLISHER;""",book_conn)
+
+
+        self.print_label = tk.Text(self.tabview.tab("New Book"),font=print_font,width=30,height=10)
+        scroll_bar = CTkScrollbar(self.tabview.tab("New Book"),command=self.print_label.yview)
+
+        self.print_label.configure(yscrollcommand=scroll_bar.set)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+        columns = "\t\t".join(print_table.columns)
+        self.print_label.insert(tk.END,columns)
+
+
+        for index,row in print_table.iterrows():
+            self.print_label.insert(tk.END,f"\n{row[0]}")
+
+
+        self.print_label.configure(state="disabled")
+
+        self.hide_query = CTkButton(master=self.tabview.tab("New Book"),text="       Hide       ",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.315,rely=0.97,anchor=tk.SW)
+
+        book_conn.commit()
+        book_conn.close()
+
+    # Query 3
+    def print_authors(self):
+        book_conn = sqlite3.connect('Database_copy.db')
+
+        button_font = CTkFont(family='Helvetica',size=16)
+        print_font = CTkFont(family='Helvetica',size=18)
+        
+        
+        print_table = pd.read_sql(f"""SELECT *
+                                FROM BOOK_AUTHORS;""",book_conn)
+
+
+        self.print_label = tk.Text(self.tabview.tab("New Book"),font=print_font,width=40,height=10)
+        scroll_bar = CTkScrollbar(self.tabview.tab("New Book"),command=self.print_label.yview)
+
+        self.print_label.configure(yscrollcommand=scroll_bar.set)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+        columns = "\t\t".join(print_table.columns)
+        self.print_label.insert(tk.END,columns)
+
+
+        for index,row in print_table.iterrows():
+            self.print_label.insert(tk.END,f"\n{row[0]}\t\t{row[1]}")
+
+
+        self.print_label.configure(state="disabled")
+
+        self.hide_query = CTkButton(master=self.tabview.tab("New Book"),text="    Hide    ",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.16,rely=0.97,anchor=tk.SW)
+
+        book_conn.commit()
+        book_conn.close()
+
+    # Query 3
+    def print_book(self):
+        book_conn = sqlite3.connect('Database_copy.db')
+
+        button_font = CTkFont(family='Helvetica',size=16)
+        print_font = CTkFont(family='Helvetica',size=18)
+        
+        # card_cur = card_conn.cursor()
+        print_table = pd.read_sql(f"""SELECT title, book_publisher
+                                FROM BOOK
+                                ORDER BY book_id ASC;""",book_conn)
+
+
+        self.print_label = tk.Text(self.tabview.tab("New Book"),font=print_font,width=60,height=10)
+        scroll_bar = CTkScrollbar(self.tabview.tab("New Book"),command=self.print_label.yview)
+
+        self.print_label.configure(yscrollcommand=scroll_bar.set)
+        self.print_label.place(relx=0.50,rely=0.60,anchor=tk.CENTER)
+
+        columns = "\t\t\t\t".join(print_table.columns)
+        self.print_label.insert(tk.END,columns)
+
+
+        for index,row in print_table.iterrows():
+            self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
+
+
+        self.print_label.configure(state="disabled")
+
+        self.hide_query = CTkButton(master=self.tabview.tab("New Book"),text="  Hide  ",fg_color="#0077b6",
+                                    width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+        self.hide_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
+
+        book_conn.commit()
+        book_conn.close()
 
 
     # Query 4
@@ -947,6 +965,97 @@ class App:
 
         late_fee_conn.commit()
         late_fee_conn.close()
+    
+        # Query 6b
+    def book_info_query(self):
+        info_conn = sqlite3.connect('Database_copy.db')
+
+        button_font = CTkFont(family='Helvetica',size=16)
+        print_font = CTkFont(family='Helvetica',size=18)
+
+        id = self.book_id_input.get()
+        title = self.book_ti_input.get()
+
+        if id != "" and title == "":
+            self.book_id_input.delete('0',ck.END)
+
+            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo NATURAL JOIN BOOK b WHERE b.book_id = '{id}' ORDER BY LateFeeBalance DESC;",info_conn)
+
+            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
+            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
+
+            self.print_label.configure(yscrollcommand=scroll_bar.set)
+            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
+
+            columns = "\t\t\t\t".join(print_table.columns)
+            self.print_label.insert(tk.END,columns)
+
+
+            for index,row in print_table.iterrows():
+                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
+
+
+            self.print_label.configure(state="disabled")
+
+            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
+        
+        elif id == "" and title != "":
+            self.book_ti_input.delete('0',ck.END)
+
+            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo WHERE title LIKE '%{title}%' ORDER BY LateFeeBalance DESC;",info_conn)
+
+            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
+            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
+
+            self.print_label.configure(yscrollcommand=scroll_bar.set)
+            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
+
+            columns = "\t\t\t\t".join(print_table.columns)
+            self.print_label.insert(tk.END,columns)
+
+
+            for index,row in print_table.iterrows():
+                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
+
+
+            self.print_label.configure(state="disabled")
+
+            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
+
+
+        elif id == "" and title == "":
+            
+            print_table = pd.read_sql(f"SELECT title,CASE WHEN LateFeeBalance > 0 THEN (CASE When LateFeeBalance LIKE '%.__' THEN '$'||LateFeeBalance ELSE '$'||LateFeeBalance||'0' END) ELSE 'N/A' END Late_Fee FROM vBookLoanInfo ORDER BY LateFeeBalance DESC;",info_conn)
+
+            self.print_label = tk.Text(self.tabview.tab("Book Information"),font=print_font,width=42,height=10)
+            scroll_bar = CTkScrollbar(self.tabview.tab("Book Information"),command=self.print_label.yview)
+
+            self.print_label.configure(yscrollcommand=scroll_bar.set)
+            self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
+
+            columns = "\t\t\t\t".join(print_table.columns)
+            self.print_label.insert(tk.END,columns)
+
+
+            for index,row in print_table.iterrows():
+                self.print_label.insert(tk.END,f"\n{row[0]}\t\t\t\t{row[1]}")
+
+
+            self.print_label.configure(state="disabled")
+
+            self.hide_query = CTkButton(master=self.tabview.tab("Book Information"),text="  Hide  ",fg_color="#0077b6",
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
+            self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
+
+
+
+
+        info_conn.commit()
+        info_conn.close()
 
     def hide_copies(self):
         self.print_label.place_forget()
