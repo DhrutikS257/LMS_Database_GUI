@@ -1,7 +1,7 @@
 from PIL import Image
 import customtkinter as ck
 from tkinter import ttk
-from customtkinter import CTkImage,CTkFont,CTkButton,CTkTabview,CTkEntry,CTkLabel
+from customtkinter import CTkImage,CTkFont,CTkButton,CTkTabview,CTkEntry,CTkLabel,CTkScrollbar
 from datetime import date, timedelta
 import tkinter as tk
 import pandas as pd
@@ -17,7 +17,7 @@ class App:
         self.window = window
         self.window.title("LMS Database")
         self.window.geometry("800x600")
-        self.window.iconbitmap("icons/bookshelf.ico")
+        # self.window.iconbitmap("icons/bookshelf.png")
         # self.window.resizable(False,False)
         self.create_into_frame()
 
@@ -229,6 +229,8 @@ class App:
         print_font = CTkFont(family='Helvetica',size=18)
 
         if name != "" and title != "":
+            self.name_input.delete('0',ck.END)
+            self.book_input.delete('0',ck.END)
             checkout_cur.execute(f"""
                                 INSERT INTO BOOK_LOANS(book_id,branch_id,card_no,date_out,due_date,Late)
                                 SELECT b.book_id,bc.branch_id,bo.card_no,'{today}','{month}',0
@@ -247,14 +249,14 @@ class App:
             self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text="Borrow name is required",font=print_font)
             self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
             self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="  Hide  ",fg_color="#0077b6",
-                                        width=40,height=30,corner_radius=20,font=button_font,command=self.hide_copies)
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
             self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
             
         elif name != "" and title =="":
             self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text="Book title is required",font=print_font)
             self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
             self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="  Hide  ",fg_color="#0077b6",
-                                        width=40,height=30,corner_radius=20,font=button_font,command=self.hide_copies)
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
             self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
         
         else:
@@ -263,7 +265,7 @@ class App:
             self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
 
             self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="  Hide  ",fg_color="#0077b6",
-                                        width=40,height=30,corner_radius=20,font=button_font,command=self.hide_copies)
+                                        width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
             self.hide_query.place(relx=0.97,rely=0.97,anchor=tk.SE)
 
         
@@ -273,20 +275,28 @@ class App:
     def print_copies(self):
 
         copies_conn = sqlite3.connect('Database_copy.db')
-        copies_cur= copies_conn.cursor()
 
-        copies_cur.execute("SELECT * FROM BOOK_COPIES")
+        print_table = pd.read_sql('SELECT * FROM BOOK_COPIES',copies_conn,)
+        print_font = CTkFont(family='Helvetica',size=12)
 
-        print_table = from_db_cursor(copies_cur)
-        print_table.left_padding_width=10
-        print_table.right_padding_width=10
+        self.print_label = tk.Text(self.tabview.tab("Book Checkout"),font=print_font,width=50,height=20)
+        scroll_bar = CTkScrollbar(self.tabview.tab("Book Checkout"),command=self.print_label.yview)
 
-        print_font = CTkFont(family='Helvetica',size=8)
-        self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text=print_table,font=print_font)
+        self.print_label.configure(yscrollcommand=scroll_bar.set)
         self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
 
+        columns = "\t\t".join(print_table.columns)
+        self.print_label.insert(tk.END,columns)
+
+
+        for index,row in print_table.iterrows():
+            self.print_label.insert(tk.END,f"\n{row[0]}\t\t{row[1]}\t\t{row[2]}")
+
+
+        self.print_label.configure(state="disabled")
+
         button_font = CTkFont(family='Helvetica',size=16)
-        self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="   Hide   ",fg_color="#0077b6",
+        self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="    Hide    ",fg_color="#0077b6",
                                     width=30,height=25,corner_radius=20,font=button_font,command=self.hide_copies)
         self.hide_query.place(relx=0.03,rely=0.97,anchor=tk.SW)
         
@@ -296,17 +306,26 @@ class App:
 
     def print_loans(self):
         loan_conn = sqlite3.connect('Database_copy.db')
-        loans_cur = loan_conn.cursor()
 
-        loans_cur.execute("""SELECT * FROM BOOK_LOANS""")
+        print_table = pd.read_sql('SELECT book_id,branch_id,card_no,date_out,due_date FROM BOOK_LOANS',loan_conn)
+        print_font = CTkFont(family='Helvetica',size=12)
 
-        print_table = from_db_cursor(loans_cur)
-        print_table.left_padding_width=5
-        print_table.right_padding_width=5
+        self.print_label = tk.Text(self.tabview.tab("Book Checkout"),font=print_font,width=80,height=20)
+        yscroll_bar = CTkScrollbar(self.tabview.tab("Book Checkout"),command=self.print_label.yview)
 
-        print_font = CTkFont(family='Helvetica',size=8)
-        self.print_label = CTkLabel(self.tabview.tab("Book Checkout"),text=print_table,font=print_font)
+        self.print_label.configure(yscrollcommand=yscroll_bar.set)
         self.print_label.place(relx=0.50,rely=0.52,anchor=tk.CENTER)
+
+        columns = "\t\t".join(print_table.columns)
+        self.print_label.insert(tk.END,columns)
+
+        for index,row in print_table.iterrows():
+            self.print_label.insert(tk.END,f"\n{row[0]}\t\t{row[1]}\t\t{row[2]}\t\t{row[3]}\t\t{row[4]}")
+
+
+        self.print_label.configure(state="disabled")
+
+        
 
         button_font = CTkFont(family='Helvetica',size=16)
         self.hide_query = CTkButton(master=self.tabview.tab("Book Checkout"),text="   Hide   ",fg_color="#0077b6",
